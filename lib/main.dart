@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'screens/SignInPage.dart';
 import 'screens/SignUpPage.dart';
+import 'screens/Home.dart';
 //import 'screens/ForgotPasswordPage.dart';
 // import 'routes.dart';  // if you made a central routes.dart
 
@@ -34,6 +35,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/signin':      (_) => const SignInPage(),
         '/signup':      (_) => const SignUpPage(),
+        '/home':       (_) => const HomePage(),
       },
       initialRoute: '/signin',
       onUnknownRoute: (settings) => MaterialPageRoute(
