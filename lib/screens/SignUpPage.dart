@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../services/auth_service.dart';
+import '../helpers/ui_helper.dart';
 
 class SignUpPage extends StatefulWidget {
   static const routeName = '/sign-up';
@@ -11,16 +13,16 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _fullNameController    = TextEditingController();
   final TextEditingController _emailController       = TextEditingController();
   final TextEditingController _passwordController    = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
+  final AuthService _authService = AuthService();
+  bool _loading = false;
   bool _obscurePassword = true;
   bool _obscureConfirm  = true;
 
   @override
   void dispose() {
-    _fullNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -34,6 +36,31 @@ class _SignUpPageState extends State<SignUpPage> {
   void _toggleConfirm() {
     setState(() => _obscureConfirm = !_obscureConfirm);
   }
+
+  void _signUp() {
+    if (_formKey.currentState!.validate()) {
+      _authService.signUp(
+        email: _emailController.text,
+        password: _passwordController.text,
+      ).then((user) {
+        if (user != null) {
+          Navigator.pushNamed(context, '/home');
+        } else {
+          // Handle sign-up error
+          if (user == null) {
+            UIHelper.showToast('Sign-up failed. Please try again.', isError: true);
+          } else {
+            UIHelper.showToast('User already exists. Please sign in.', isError: true);
+          }        
+        }
+      }).catchError((error) {
+          print(error.message);
+        // Handle sign-up error
+        UIHelper.showToast('Sign-up failed: ${error.message}', isError: true);
+      });
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -77,23 +104,6 @@ class _SignUpPageState extends State<SignUpPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Full Name
-                    TextFormField(
-                      controller: _fullNameController,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.grey[100],
-                        hintText: 'Full Name',
-                        prefixIcon: Icon(Icons.person, color: Colors.grey[600]),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                      validator: (v) => (v == null || v.isEmpty) ? 'Please enter your full name' : null,
-                    ),
-                    const SizedBox(height: 16),
-
                     // Email
                     TextFormField(
                       controller: _emailController,
@@ -171,29 +181,34 @@ class _SignUpPageState extends State<SignUpPage> {
                     const SizedBox(height: 24),
 
                     // Sign Up Button
-                    GestureDetector(
-                      onTap: () {
-                        if (_formKey.currentState!.validate()) {
-                          // TODO: Implement sign-up logic
-                        }
-                      },
-                      child: Container(
-                        height: 52,
-                        decoration: BoxDecoration(
-                          color: Colors.lightGreen[500],
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'Sign Up',
-                            style: TextStyle(
-                              fontFamily: 'Roboto',
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
+                    SizedBox(
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: _loading ? null : _signUp,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.lightGreen[500],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
                         ),
+                        child: _loading
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text(
+                              'Register',
+                              style: TextStyle(
+                                fontFamily: 'Roboto',
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                       ),
                     ),
 

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../services/auth_service.dart';
+import '../helpers/ui_helper.dart';
 
 class SignInPage extends StatefulWidget {
   static const routeName = '/sign-in';
@@ -13,6 +15,8 @@ class _SignInPageState extends State<SignInPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
+  bool _loading = false;
   bool _obscurePassword = true;
 
   @override
@@ -27,6 +31,33 @@ class _SignInPageState extends State<SignInPage> {
       _obscurePassword = !_obscurePassword;
     });
   }
+
+  Future<void> _signIn() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _loading = true);
+    try {
+      final user = await _authService.signIn(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+      if (user != null) {
+        Navigator.pushReplacementNamed(context, '/home');
+      }
+    } catch (e) {
+      // Handle error (e.g., show a toast)
+      if (e.toString().contains('invalid_credentials')) {
+        UIHelper.showToast('Invalid email or password', isError: true);
+      } else if (e.toString().contains('user not found')) {
+        UIHelper.showToast('User not found', isError: true);
+      } else {
+        UIHelper.showToast('An error occurred. Please try again.', isError: true);
+      }
+    } finally {
+      setState(() => _loading = false);
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +82,7 @@ class _SignInPageState extends State<SignInPage> {
                   'Sign in to your Account',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontFamily: 'Roboto',      // or any font you’ve configured
+                    fontFamily: 'Roboto',
                     color: Colors.white,
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
@@ -143,30 +174,34 @@ class _SignInPageState extends State<SignInPage> {
 
                     // Login Button
                     SizedBox(height: 8),
-                    GestureDetector(
-                      onTap: () {
-                        if (_formKey.currentState!.validate()) {
-                          // Sign-in logic
-                          //TODO: Implement sign-in logic here
-                        }
-                      },
-                      child: Container(
-                        height: 52,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: Colors.lightGreen[500],
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Login',
-                            style: TextStyle(
-                              fontFamily: 'Roboto', 
-                              color: Colors.white,
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                            ),
+                    SizedBox(
+                      height: 52,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.lightGreen[500],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
                         ),
+                        onPressed: _loading ? null : _signIn,
+                        child: _loading
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text(
+                              'Login',
+                              style: TextStyle(
+                                fontFamily: 'Roboto',
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                       ),
                     ),
 
