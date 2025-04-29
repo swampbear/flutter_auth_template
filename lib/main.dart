@@ -17,6 +17,7 @@ Future<void> main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+  
 
   // This widget is the root of your application.
   @override
@@ -60,12 +61,20 @@ class MyHomePage extends StatefulWidget {
 
   final String title;
 
+ 
+
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+
+   @override
+   initState() {
+      final user = Supabase.instance.client.auth.currentUser;
+      print('Supabase initialized, currentUser=$user');
+    }
 
   void _incrementCounter() {
     setState(() {
