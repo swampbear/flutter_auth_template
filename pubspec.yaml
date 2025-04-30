@@ -38,6 +38,7 @@ dependencies:
   supabase_flutter: ^2.0.0
   flutter_dotenv: ^5.0.0
   fluttertoast: ^8.2.12
+  flutter_riverpod: ^2.0.0
 
 dev_dependencies:
   flutter_test:

@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
-import '../services/auth_service.dart';
 import '../helpers/ui_helper.dart';
+import '../viewmodels/auth_state.dart';
+import '../viewmodels/signup_viewmodel.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SignUpPage extends StatefulWidget {
+
+class SignUpPage extends ConsumerStatefulWidget {
   static const routeName = '/sign-up';
 
   const SignUpPage({Key? key}) : super(key: key);
 
   @override
-  _SignUpPageState createState() => _SignUpPageState();
+  ConsumerState<SignUpPage> createState() => _SignUpPageState();
 }
 
-class _SignUpPageState extends State<SignUpPage> {
+class _SignUpPageState extends ConsumerState<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController       = TextEditingController();
   final TextEditingController _passwordController    = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
-  final AuthService _authService = AuthService();
   bool _loading = false;
   bool _obscurePassword = true;
   bool _obscureConfirm  = true;
@@ -37,34 +39,23 @@ class _SignUpPageState extends State<SignUpPage> {
     setState(() => _obscureConfirm = !_obscureConfirm);
   }
 
-  void _signUp() {
-    if (_formKey.currentState!.validate()) {
-      _authService.signUp(
-        email: _emailController.text,
-        password: _passwordController.text,
-      ).then((user) {
-        if (user != null) {
-          Navigator.pushNamed(context, '/home');
-        } else {
-          // Handle sign-up error
-          if (user == null) {
-            UIHelper.showToast('Sign-up failed. Please try again.', isError: true);
-          } else {
-            UIHelper.showToast('User already exists. Please sign in.', isError: true);
-          }        
-        }
-      }).catchError((error) {
-          print(error.message);
-        // Handle sign-up error
-        UIHelper.showToast('Sign-up failed: ${error.message}', isError: true);
-      });
-    }
-  }
-
 
   @override
   Widget build(BuildContext context) {
     final headerHeight = MediaQuery.of(context).size.height * 0.3;
+    final authState = ref.watch(signUpViewModelProvider);
+    final signUpVM = ref.read(signUpViewModelProvider.notifier);
+
+    ref.listen<AuthState>(signUpViewModelProvider, (prev, next) {
+          if (next.status == AuthStatus.error) {
+            UIHelper.showToast(
+              next.errorMessage!,
+              isError: true,
+            );
+          } else if (next.status == AuthStatus.success) {
+            Navigator.pushReplacementNamed(context, '/home');
+          }
+          });
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -184,22 +175,24 @@ class _SignUpPageState extends State<SignUpPage> {
                     SizedBox(
                       height: 52,
                       child: ElevatedButton(
-                        onPressed: _loading ? null : _signUp,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.lightGreen[500],
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: _loading
-                          ? const SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
+                        onPressed: authState.status == AuthStatus.loading
+                          ? null
+                          : () {
+                              if (_formKey.currentState!.validate()) {
+                                signUpVM.signUp(
+                                  _emailController.text.trim(),
+                                  _passwordController.text,
+                                );
+                              }
+                            },
+                        child: authState.status == AuthStatus.loading
+                          ? const CircularProgressIndicator()
                           : const Text(
                               'Register',
                               style: TextStyle(
@@ -208,7 +201,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                               ),
-                            ),
+                          ),
+
                       ),
                     ),
 

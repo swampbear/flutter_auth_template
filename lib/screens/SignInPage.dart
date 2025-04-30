@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import '../services/auth_service.dart';
 import '../helpers/ui_helper.dart';
+import '../viewmodels/auth_state.dart';
+import '../viewmodels/auth_viewmodel.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SignInPage extends StatefulWidget {
-  static const routeName = '/sign-in';
+class SignInPage extends ConsumerStatefulWidget {
+  static const routeName = '/signin';
 
   const SignInPage({Key? key}) : super(key: key);
 
@@ -11,12 +13,10 @@ class SignInPage extends StatefulWidget {
   _SignInPageState createState() => _SignInPageState();
 }
 
-class _SignInPageState extends State<SignInPage> {
+class _SignInPageState extends ConsumerState<SignInPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final AuthService _authService = AuthService();
-  bool _loading = false;
   bool _obscurePassword = true;
 
   @override
@@ -32,35 +32,22 @@ class _SignInPageState extends State<SignInPage> {
     });
   }
 
-  Future<void> _signIn() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() => _loading = true);
-    try {
-      final user = await _authService.signIn(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-      );
-      if (user != null) {
-        Navigator.pushReplacementNamed(context, '/home');
-      }
-    } catch (e) {
-      // Handle error (e.g., show a toast)
-      if (e.toString().contains('invalid_credentials')) {
-        UIHelper.showToast('Invalid email or password', isError: true);
-      } else if (e.toString().contains('user not found')) {
-        UIHelper.showToast('User not found', isError: true);
-      } else {
-        UIHelper.showToast('An error occurred. Please try again.', isError: true);
-      }
-    } finally {
-      setState(() => _loading = false);
-    }
-  }
-
-
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(signInViewModelProvider);
+    final authVM = ref.read(signInViewModelProvider.notifier);
+    
+    ref.listen<AuthState>(signInViewModelProvider, (prev, next) {
+      if (next.status == AuthStatus.error) {
+        UIHelper.showToast(
+          next.errorMessage!,
+          isError: true,
+        );
+      } else if (next.status == AuthStatus.success) {
+        Navigator.pushReplacementNamed(context, '/home');
+      }
+    });
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -183,16 +170,18 @@ class _SignInPageState extends State<SignInPage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        onPressed: _loading ? null : _signIn,
-                        child: _loading
-                          ? const SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
+                        onPressed: authState.status == AuthStatus.loading
+                          ? null
+                          : () {
+                              if (_formKey.currentState!.validate()) {
+                                authVM.signIn(
+                                  _emailController.text.trim(),
+                                  _passwordController.text,
+                                );
+                              }
+                            },
+                        child: authState.status == AuthStatus.loading
+                          ? const CircularProgressIndicator()
                           : const Text(
                               'Login',
                               style: TextStyle(
@@ -201,7 +190,8 @@ class _SignInPageState extends State<SignInPage> {
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                               ),
-                            ),
+                          ),
+
                       ),
                     ),
 
