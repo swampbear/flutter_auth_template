@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/user.dart';
 import '../repositories/auth_repository.dart';
 import 'auth_state.dart';
-import '../providers.dart';
+import '../providers.dart';  // for authRepositoryProvider
 
 /// The provider you’ll watch in your SignUpPage:
 final signUpViewModelProvider =

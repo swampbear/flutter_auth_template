@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../viewmodels/signout_viewmodel.dart';
 
-class HomePage extends StatelessWidget {
+
+
+class HomePage extends ConsumerWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final signOutState = ref.watch(signOutViewModelProvider);
+    final signOutVM    = ref.read(signOutViewModelProvider.notifier);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home'),
@@ -44,14 +50,21 @@ class HomePage extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.logout),
+              leading: signOutState.isLoading
+                  ? const SizedBox(
+                      width: 24, height: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.logout),
               title: const Text('Logout'),
-              onTap: () {
-                // Handle logout functionality
-                // AuthService.logout();
-                // Navigator.pushReplacementNamed(context, '/login');
-                Navigator.pop(context);
-              },
+              onTap: signOutState.isLoading
+                  ? null
+                  : () {
+                      // Close the drawer immediately
+                      Navigator.of(context).pop();
+                      // Trigger the signOut flow
+                      signOutVM.signOut();
+                    },
             ),
           ],
         ),

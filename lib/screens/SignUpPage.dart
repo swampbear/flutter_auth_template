@@ -19,7 +19,6 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
   final TextEditingController _emailController       = TextEditingController();
   final TextEditingController _passwordController    = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
-  bool _loading = false;
   bool _obscurePassword = true;
   bool _obscureConfirm  = true;
 
@@ -39,7 +38,6 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
     setState(() => _obscureConfirm = !_obscureConfirm);
   }
 
-
   @override
   Widget build(BuildContext context) {
     final headerHeight = MediaQuery.of(context).size.height * 0.3;
@@ -53,7 +51,11 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
               isError: true,
             );
           } else if (next.status == AuthStatus.success) {
-            Navigator.pushReplacementNamed(context, '/home');
+            UIHelper.showToast(
+              'Sign-up successful!',
+              isError: false,
+            );
+            Navigator.pushNamed(context, '/signin');
           }
           });
 

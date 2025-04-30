@@ -43,7 +43,12 @@ class _SignInPageState extends ConsumerState<SignInPage> {
           next.errorMessage!,
           isError: true,
         );
-      } else if (next.status == AuthStatus.success) {
+      }
+      if (next.status == AuthStatus.success) {
+        UIHelper.showToast(
+          'Login successful',
+          isError: false,
+        );
         Navigator.pushReplacementNamed(context, '/home');
       }
     });
