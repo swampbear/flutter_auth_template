@@ -27,10 +27,7 @@ class AuthService {
     required String password,
   }) async {
     try {
-      final res = await _client.auth.signUp(
-        email: email,
-        password: password,
-      );
+      final res = await _client.auth.signUp(email: email, password: password);
       return res.user;
     } on AuthException catch (e) {
       throw e;

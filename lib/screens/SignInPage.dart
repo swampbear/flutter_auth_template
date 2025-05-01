@@ -5,7 +5,6 @@ import '../viewmodels/auth_viewmodel.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-
 class SignInPage extends ConsumerStatefulWidget {
   static const routeName = '/signin';
 
@@ -38,19 +37,13 @@ class _SignInPageState extends ConsumerState<SignInPage> {
   Widget build(BuildContext context) {
     final authState = ref.watch(signInViewModelProvider);
     final authVM = ref.read(signInViewModelProvider.notifier);
-    
+
     ref.listen<AuthState>(signInViewModelProvider, (prev, next) {
       if (next.status == AuthStatus.error) {
-        UIHelper.showToast(
-          next.errorMessage!,
-          isError: true,
-        );
+        UIHelper.showToast(next.errorMessage!, isError: true);
       }
       if (next.status == AuthStatus.success) {
-        UIHelper.showToast(
-          'Login successful',
-          isError: false,
-        );
+        UIHelper.showToast('Login successful', isError: false);
         context.go('/home');
       }
     });
@@ -127,9 +120,9 @@ class _SignInPageState extends ConsumerState<SignInPage> {
                         prefixIcon: Icon(Icons.lock, color: Colors.grey[600]),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscurePassword 
-                              ? Icons.visibility_off 
-                              : Icons.visibility,
+                            _obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                             color: Colors.grey[600],
                           ),
                           onPressed: () {
@@ -177,28 +170,29 @@ class _SignInPageState extends ConsumerState<SignInPage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        onPressed: authState.status == AuthStatus.loading
-                          ? null
-                          : () {
-                              if (_formKey.currentState!.validate()) {
-                                authVM.signIn(
-                                  _emailController.text.trim(),
-                                  _passwordController.text,
-                                );
-                              }
-                            },
-                        child: authState.status == AuthStatus.loading
-                          ? const CircularProgressIndicator()
-                          : const Text(
-                              'Login',
-                              style: TextStyle(
-                                fontFamily: 'Roboto',
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                          ),
-
+                        onPressed:
+                            authState.status == AuthStatus.loading
+                                ? null
+                                : () {
+                                  if (_formKey.currentState!.validate()) {
+                                    authVM.signIn(
+                                      _emailController.text.trim(),
+                                      _passwordController.text,
+                                    );
+                                  }
+                                },
+                        child:
+                            authState.status == AuthStatus.loading
+                                ? const CircularProgressIndicator()
+                                : const Text(
+                                  'Login',
+                                  style: TextStyle(
+                                    fontFamily: 'Roboto',
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                       ),
                     ),
 
@@ -248,7 +242,10 @@ class _SignInPageState extends ConsumerState<SignInPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("Don't have an account? ", style: TextStyle(color: Colors.grey[700])),
+                        Text(
+                          "Don't have an account? ",
+                          style: TextStyle(color: Colors.grey[700]),
+                        ),
                         GestureDetector(
                           onTap: () {
                             context.push('/signup');

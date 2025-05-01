@@ -4,9 +4,9 @@ import '../repositories/auth_repository.dart';
 
 final signOutViewModelProvider =
     StateNotifierProvider<SignOutViewModel, AsyncValue<void>>((ref) {
-  final repo = ref.read(authRepositoryProvider);
-  return SignOutViewModel(repo);
-});
+      final repo = ref.read(authRepositoryProvider);
+      return SignOutViewModel(repo);
+    });
 
 class SignOutViewModel extends StateNotifier<AsyncValue<void>> {
   SignOutViewModel(this._repo) : super(const AsyncValue.data(null));

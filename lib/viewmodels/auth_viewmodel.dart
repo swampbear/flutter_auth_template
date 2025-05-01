@@ -9,9 +9,9 @@ import '../providers.dart';
 /// 1) Sign-In ViewModel + State Provider
 final signInViewModelProvider =
     StateNotifierProvider<SignInViewModel, AuthState>((ref) {
-  final repo = ref.read(authRepositoryProvider);
-  return SignInViewModel(repo, ref);
-});
+      final repo = ref.read(authRepositoryProvider);
+      return SignInViewModel(repo, ref);
+    });
 
 class SignInViewModel extends StateNotifier<AuthState> {
   SignInViewModel(this._repo, this._ref) : super(AuthState.idle());
@@ -36,9 +36,9 @@ class SignInViewModel extends StateNotifier<AuthState> {
 /// 2) Sign-Up ViewModel + State Provider
 final signUpViewModelProvider =
     StateNotifierProvider<SignUpViewModel, AuthState>((ref) {
-  final repo = ref.read(authRepositoryProvider);
-  return SignUpViewModel(repo, ref);
-});
+      final repo = ref.read(authRepositoryProvider);
+      return SignUpViewModel(repo, ref);
+    });
 
 class SignUpViewModel extends StateNotifier<AuthState> {
   SignUpViewModel(this._repo, this._ref) : super(AuthState.idle());

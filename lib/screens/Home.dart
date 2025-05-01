@@ -2,16 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../viewmodels/signout_viewmodel.dart';
 
-
-
 class HomePage extends ConsumerWidget {
-
   const HomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final signOutState = ref.watch(signOutViewModelProvider);
-    final signOutVM    = ref.read(signOutViewModelProvider.notifier);
+    final signOutVM = ref.read(signOutViewModelProvider.notifier);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home'),
@@ -30,39 +27,36 @@ class HomePage extends ConsumerWidget {
           padding: EdgeInsets.zero,
           children: [
             const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
+              decoration: BoxDecoration(color: Colors.blue),
               child: Text(
                 'Menu',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 24),
               ),
             ),
             ListTile(
               leading: const Icon(Icons.person),
               title: const Text('Profile'),
-              onTap: () {
-              },
+              onTap: () {},
             ),
             ListTile(
-              leading: signOutState.isLoading
-                  ? const SizedBox(
-                      width: 24, height: 24,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.logout),
+              leading:
+                  signOutState.isLoading
+                      ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                      : const Icon(Icons.logout),
               title: const Text('Logout'),
-              onTap: signOutState.isLoading
-                  ? null
-                  : () {
-                      // Close the drawer immediately
-                      Navigator.of(context).pop();
-                      // Trigger the signOut flow
-                      signOutVM.signOut();
-                    },
+              onTap:
+                  signOutState.isLoading
+                      ? null
+                      : () {
+                        // Close the drawer immediately
+                        Navigator.of(context).pop();
+                        // Trigger the signOut flow
+                        signOutVM.signOut();
+                      },
             ),
           ],
         ),
@@ -94,14 +88,8 @@ class HomePage extends ConsumerWidget {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
           BottomNavigationBarItem(
             icon: Icon(Icons.notifications),
             label: 'Notifications',

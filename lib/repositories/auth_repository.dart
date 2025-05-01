@@ -13,9 +13,7 @@ class AuthRepository {
     required String email,
     required String password,
   }) async {
-    final User? raw = await _service.signIn(
-      email: email, password: password,
-    );
+    final User? raw = await _service.signIn(email: email, password: password);
     if (raw == null) return null;
     return domain.User(id: raw.id, email: raw.email!);
   }
@@ -24,9 +22,7 @@ class AuthRepository {
     required String email,
     required String password,
   }) async {
-    final User? raw = await _service.signUp(
-      email: email, password: password,
-    );
+    final User? raw = await _service.signUp(email: email, password: password);
     if (raw == null) return null;
     return domain.User(id: raw.id, email: raw.email!);
   }

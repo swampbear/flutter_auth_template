@@ -5,7 +5,6 @@ import '../viewmodels/signup_viewmodel.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-
 class SignUpPage extends ConsumerStatefulWidget {
   static const routeName = '/sign-up';
 
@@ -17,11 +16,12 @@ class SignUpPage extends ConsumerStatefulWidget {
 
 class _SignUpPageState extends ConsumerState<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController       = TextEditingController();
-  final TextEditingController _passwordController    = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   bool _obscurePassword = true;
-  bool _obscureConfirm  = true;
+  bool _obscureConfirm = true;
 
   @override
   void dispose() {
@@ -46,19 +46,13 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
     final signUpVM = ref.read(signUpViewModelProvider.notifier);
 
     ref.listen<AuthState>(signUpViewModelProvider, (prev, next) {
-          if (next.status == AuthStatus.error) {
-            UIHelper.showToast(
-              next.errorMessage!,
-              isError: true,
-            );
-          } else if (next.status == AuthStatus.success) {
-            UIHelper.showToast(
-              'Sign-up successful!',
-              isError: false,
-            );
-            Navigator.pushNamed(context, '/signin');
-          }
-          });
+      if (next.status == AuthStatus.error) {
+        UIHelper.showToast(next.errorMessage!, isError: true);
+      } else if (next.status == AuthStatus.success) {
+        UIHelper.showToast('Sign-up successful!', isError: false);
+        Navigator.pushNamed(context, '/signin');
+      }
+    });
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -72,7 +66,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
               decoration: BoxDecoration(
                 color: Colors.indigo[900],
                 borderRadius: const BorderRadius.only(
-                  bottomLeft:  Radius.circular(32),
+                  bottomLeft: Radius.circular(32),
                   bottomRight: Radius.circular(32),
                 ),
               ),
@@ -112,7 +106,11 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                         ),
                       ),
                       keyboardType: TextInputType.emailAddress,
-                      validator: (v) => (v == null || v.isEmpty) ? 'Please enter your email' : null,
+                      validator:
+                          (v) =>
+                              (v == null || v.isEmpty)
+                                  ? 'Please enter your email'
+                                  : null,
                     ),
                     const SizedBox(height: 16),
 
@@ -127,7 +125,9 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                         prefixIcon: Icon(Icons.lock, color: Colors.grey[600]),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                            _obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                             color: Colors.grey[600],
                           ),
                           onPressed: _togglePassword,
@@ -137,7 +137,11 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                           borderSide: BorderSide.none,
                         ),
                       ),
-                      validator: (v) => (v == null || v.isEmpty) ? 'Please enter a password' : null,
+                      validator:
+                          (v) =>
+                              (v == null || v.isEmpty)
+                                  ? 'Please enter a password'
+                                  : null,
                     ),
                     const SizedBox(height: 16),
 
@@ -152,7 +156,9 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                         prefixIcon: Icon(Icons.lock, color: Colors.grey[600]),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscureConfirm ? Icons.visibility_off : Icons.visibility,
+                            _obscureConfirm
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                             color: Colors.grey[600],
                           ),
                           onPressed: _toggleConfirm,
@@ -184,28 +190,29 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        onPressed: authState.status == AuthStatus.loading
-                          ? null
-                          : () {
-                              if (_formKey.currentState!.validate()) {
-                                signUpVM.signUp(
-                                  _emailController.text.trim(),
-                                  _passwordController.text,
-                                );
-                              }
-                            },
-                        child: authState.status == AuthStatus.loading
-                          ? const CircularProgressIndicator()
-                          : const Text(
-                              'Register',
-                              style: TextStyle(
-                                fontFamily: 'Roboto',
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                          ),
-
+                        onPressed:
+                            authState.status == AuthStatus.loading
+                                ? null
+                                : () {
+                                  if (_formKey.currentState!.validate()) {
+                                    signUpVM.signUp(
+                                      _emailController.text.trim(),
+                                      _passwordController.text,
+                                    );
+                                  }
+                                },
+                        child:
+                            authState.status == AuthStatus.loading
+                                ? const CircularProgressIndicator()
+                                : const Text(
+                                  'Register',
+                                  style: TextStyle(
+                                    fontFamily: 'Roboto',
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                       ),
                     ),
 
@@ -216,7 +223,10 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                         Expanded(child: Divider()),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text('Or sign up with', style: TextStyle(color: Colors.grey)),
+                          child: Text(
+                            'Or sign up with',
+                            style: TextStyle(color: Colors.grey),
+                          ),
                         ),
                         Expanded(child: Divider()),
                       ],
