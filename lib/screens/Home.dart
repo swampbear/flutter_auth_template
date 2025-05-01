@@ -45,9 +45,6 @@ class HomePage extends ConsumerWidget {
               leading: const Icon(Icons.person),
               title: const Text('Profile'),
               onTap: () {
-                // Navigate to profile screen
-                // Navigator.pushNamed(context, '/profile');
-                Navigator.pop(context);
               },
             ),
             ListTile(
