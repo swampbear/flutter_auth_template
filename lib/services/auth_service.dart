@@ -16,8 +16,7 @@ class AuthService {
       );
       return res.user;
     } on AuthException catch (e) {
-      // e.message has the Supabase error details
-      throw e;
+      rethrow;
     }
   }
 
@@ -30,7 +29,7 @@ class AuthService {
       final res = await _client.auth.signUp(email: email, password: password);
       return res.user;
     } on AuthException catch (e) {
-      throw e;
+      rethrow;
     }
   }
 

@@ -1,90 +1,57 @@
+/*
+  File: lib/pages/sign_up_page.dart
+*/
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../helpers/ui_helper.dart';
 import '../viewmodels/auth_state.dart';
 import '../viewmodels/signup_viewmodel.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+import '../widgets/auth_widgets.dart';
 
 class SignUpPage extends ConsumerStatefulWidget {
-  static const routeName = '/sign-up';
-
-  const SignUpPage({Key? key}) : super(key: key);
+  const SignUpPage({super.key});
 
   @override
-  ConsumerState<SignUpPage> createState() => _SignUpPageState();
+  SignUpPageState createState() => SignUpPageState();
 }
 
-class _SignUpPageState extends ConsumerState<SignUpPage> {
+class SignUpPageState extends ConsumerState<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
-  bool _obscurePassword = true;
+  final _emailCtrl = TextEditingController();
+  final _passCtrl = TextEditingController();
+  final _confirmCtrl = TextEditingController();
+  bool _obscurePass = true;
   bool _obscureConfirm = true;
 
   @override
   void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
+    _emailCtrl.dispose();
+    _passCtrl.dispose();
+    _confirmCtrl.dispose();
     super.dispose();
-  }
-
-  void _togglePassword() {
-    setState(() => _obscurePassword = !_obscurePassword);
-  }
-
-  void _toggleConfirm() {
-    setState(() => _obscureConfirm = !_obscureConfirm);
   }
 
   @override
   Widget build(BuildContext context) {
-    final headerHeight = MediaQuery.of(context).size.height * 0.3;
-    final authState = ref.watch(signUpViewModelProvider);
-    final signUpVM = ref.read(signUpViewModelProvider.notifier);
+    final state = ref.watch(signUpViewModelProvider);
+    final vm = ref.read(signUpViewModelProvider.notifier);
 
     ref.listen<AuthState>(signUpViewModelProvider, (prev, next) {
       if (next.status == AuthStatus.error) {
         UIHelper.showToast(next.errorMessage!, isError: true);
       } else if (next.status == AuthStatus.success) {
         UIHelper.showToast('Sign-up successful!', isError: false);
-        Navigator.pushNamed(context, '/signin');
+        context.push('/signin');
       }
     });
 
     return Scaffold(
-      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Header
-            Container(
-              width: double.infinity,
-              height: headerHeight,
-              decoration: BoxDecoration(
-                color: Colors.indigo[900],
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(32),
-                  bottomRight: Radius.circular(32),
-                ),
-              ),
-              child: const Center(
-                child: Text(
-                  'Create your Account',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: 'Roboto',
-                    color: Colors.white,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-
-            // Form
+            const AuthHeader('Create your Account'),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
               child: Form(
@@ -92,188 +59,92 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Email
-                    TextFormField(
-                      controller: _emailController,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.grey[100],
-                        hintText: 'Email',
-                        prefixIcon: Icon(Icons.email, color: Colors.grey[600]),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                      keyboardType: TextInputType.emailAddress,
+                    InputField(
+                      controller: _emailCtrl,
+                      hint: 'Email',
+                      icon: Icons.email,
                       validator:
                           (v) =>
-                              (v == null || v.isEmpty)
-                                  ? 'Please enter your email'
-                                  : null,
+                              (v == null || v.isEmpty) ? 'Enter email' : null,
                     ),
                     const SizedBox(height: 16),
-
-                    // Password
-                    TextFormField(
-                      controller: _passwordController,
-                      obscureText: _obscurePassword,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.grey[100],
-                        hintText: 'Password',
-                        prefixIcon: Icon(Icons.lock, color: Colors.grey[600]),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscurePassword
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                            color: Colors.grey[600],
-                          ),
-                          onPressed: _togglePassword,
+                    InputField(
+                      controller: _passCtrl,
+                      hint: 'Password',
+                      icon: Icons.lock,
+                      obscure: _obscurePass,
+                      suffix: IconButton(
+                        icon: Icon(
+                          _obscurePass
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: Colors.grey[600],
                         ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
+                        onPressed:
+                            () => setState(() => _obscurePass = !_obscurePass),
                       ),
                       validator:
                           (v) =>
                               (v == null || v.isEmpty)
-                                  ? 'Please enter a password'
+                                  ? 'Enter password'
                                   : null,
                     ),
                     const SizedBox(height: 16),
-
-                    // Confirm Password
-                    TextFormField(
-                      controller: _confirmPasswordController,
-                      obscureText: _obscureConfirm,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.grey[100],
-                        hintText: 'Confirm Password',
-                        prefixIcon: Icon(Icons.lock, color: Colors.grey[600]),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscureConfirm
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                            color: Colors.grey[600],
-                          ),
-                          onPressed: _toggleConfirm,
+                    InputField(
+                      controller: _confirmCtrl,
+                      hint: 'Confirm Password',
+                      icon: Icons.lock,
+                      obscure: _obscureConfirm,
+                      suffix: IconButton(
+                        icon: Icon(
+                          _obscureConfirm
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: Colors.grey[600],
                         ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
+                        onPressed:
+                            () => setState(
+                              () => _obscureConfirm = !_obscureConfirm,
+                            ),
                       ),
                       validator: (v) {
-                        if (v == null || v.isEmpty) {
-                          return 'Please confirm your password';
-                        }
-                        if (v != _passwordController.text) {
+                        if (v == null || v.isEmpty) return 'Confirm password';
+                        if (v != _passCtrl.text) {
                           return 'Passwords do not match';
                         }
                         return null;
                       },
                     ),
                     const SizedBox(height: 24),
-
-                    // Sign Up Button
-                    SizedBox(
-                      height: 52,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.lightGreen[500],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        onPressed:
-                            authState.status == AuthStatus.loading
-                                ? null
-                                : () {
-                                  if (_formKey.currentState!.validate()) {
-                                    signUpVM.signUp(
-                                      _emailController.text.trim(),
-                                      _passwordController.text,
-                                    );
-                                  }
-                                },
-                        child:
-                            authState.status == AuthStatus.loading
-                                ? const CircularProgressIndicator()
-                                : const Text(
-                                  'Register',
-                                  style: TextStyle(
-                                    fontFamily: 'Roboto',
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                      ),
-                    ),
-
-                    // Separator
-                    const SizedBox(height: 24),
-                    const Row(
-                      children: [
-                        Expanded(child: Divider()),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text(
-                            'Or sign up with',
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ),
-                        Expanded(child: Divider()),
-                      ],
-                    ),
-
-                    // Google Button
-                    const SizedBox(height: 24),
-                    OutlinedButton.icon(
+                    PrimaryButton(
+                      label: 'Register',
+                      loading: state.status == AuthStatus.loading,
                       onPressed: () {
-                        // TODO: Implement Google sign-up
+                        if (_formKey.currentState!.validate()) {
+                          vm.signUp(_emailCtrl.text.trim(), _passCtrl.text);
+                        }
                       },
-                      icon: const Icon(Icons.g_mobiledata),
-                      label: const Text('Google'),
-                      style: OutlinedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        side: BorderSide(color: Colors.grey.shade300),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                      ),
                     ),
-
-                    // Bottom Sign-in Link
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 24),
+                    const SeparatorWithText('Or sign up with'),
+                    const SizedBox(height: 24),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          'Already have an account? ',
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            context.push('/signin');
+                        SocialButton(
+                          icon: Icons.g_mobiledata,
+                          label: 'Google',
+                          onPressed: () {
+                            /* google signup */
                           },
-                          child: const Text(
-                            'Sign In',
-                            style: TextStyle(
-                              color: Colors.lightGreen,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 32),
+                    AuthFooterLink(
+                      text: 'Already have an account?',
+                      actionText: 'Sign In',
+                      onTap: () => context.push('/signin'),
+                    ),
                   ],
                 ),
               ),
