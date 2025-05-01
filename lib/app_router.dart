@@ -37,12 +37,12 @@ final appRouter = GoRouter(
     final loggingIn = (loc == '/signin' || loc == '/signup');
 
     if (!loggedIn && !loggingIn) return '/signin';
-    if (loggedIn && loggingIn) return '/home';
+    if (loggedIn && loggingIn) return '/';
     return null;
   },
   routes: [
     GoRoute(path: '/signin', builder: (_, __) => const SignInPage()),
     GoRoute(path: '/signup', builder: (_, __) => const SignUpPage()),
-    GoRoute(path: '/home', builder: (_, __) => const HomePage()),
+    GoRoute(path: '/', builder: (_, __) => const HomePage()),
   ],
 );
