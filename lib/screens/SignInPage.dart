@@ -36,7 +36,6 @@ class SignInPageState extends ConsumerState<SignInPage> {
         UIHelper.showToast(next.errorMessage!, isError: true);
       } else if (next.status == AuthStatus.success) {
         UIHelper.showToast('Login successful', isError: false);
-        context.go('/home');
       }
     });
 
