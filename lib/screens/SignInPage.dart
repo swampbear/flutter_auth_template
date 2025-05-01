@@ -3,6 +3,8 @@ import '../helpers/ui_helper.dart';
 import '../viewmodels/auth_state.dart';
 import '../viewmodels/auth_viewmodel.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
 
 class SignInPage extends ConsumerStatefulWidget {
   static const routeName = '/signin';
@@ -49,7 +51,7 @@ class _SignInPageState extends ConsumerState<SignInPage> {
           'Login successful',
           isError: false,
         );
-        Navigator.pushReplacementNamed(context, '/home');
+        context.go('/home');
       }
     });
 
@@ -249,7 +251,7 @@ class _SignInPageState extends ConsumerState<SignInPage> {
                         Text("Don't have an account? ", style: TextStyle(color: Colors.grey[700])),
                         GestureDetector(
                           onTap: () {
-                            Navigator.pushNamed(context, '/signup');
+                            context.push('/signup');
                           },
                           child: Text(
                             'Register',

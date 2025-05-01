@@ -3,6 +3,7 @@ import '../helpers/ui_helper.dart';
 import '../viewmodels/auth_state.dart';
 import '../viewmodels/signup_viewmodel.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 
 class SignUpPage extends ConsumerStatefulWidget {
@@ -250,7 +251,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            Navigator.pushNamed(context, '/signin');
+                            context.push('/signin');
                           },
                           child: const Text(
                             'Sign In',
